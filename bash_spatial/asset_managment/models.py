@@ -1,4 +1,5 @@
 import uuid
+from time import timezone
 from django.db import models
 from django.conf import settings
 
@@ -22,6 +23,7 @@ class Asset(models.Model):
         ("out_for_repairs", "Out for Repairs"),
         ("operational", "Operational"),
         ("checked_out", "Checked Out"),
+        ("depricated", "Depricated"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,9 +31,10 @@ class Asset(models.Model):
         max_length=31, choices=STATUS_CHOICES, default="operational"
     )
     name = models.CharField(max_length=255)
+    category = models.CharField(max_length=100, default="General")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deprication = models.DateTimeField(null=True, blank=True)
+    depreciation = models.DateField(null=True, blank=True)
     attributes = []
 
     assigned_to = models.ForeignKey(
@@ -48,3 +51,9 @@ class Asset(models.Model):
     def assignUser(self, user):
         self.assigned_to = user
         self.save()
+
+    @property
+    def is_overdue(self):
+        if self.deprication and self.status != "out_for_repairs":
+            return self.deprication < timezone.now().date()
+        return False

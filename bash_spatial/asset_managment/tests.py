@@ -1,5 +1,5 @@
 from django.test import TestCase
-from asset_managment.models import Asset
+from asset_managment.models import Asset, Attribute
 
 
 class AssetTests(TestCase):
