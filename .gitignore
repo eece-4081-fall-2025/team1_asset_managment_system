@@ -1,7 +1,13 @@
+.git/
+
+#python
+*.pyc
+
 #Logs and Data
 *.log
 *.sql
 *.sqlite
+*.sqlite3
 
 #virtual enviroment
 env/
