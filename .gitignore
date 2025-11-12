@@ -1,0 +1,8 @@
+#Logs and Data
+*.log
+*.sql
+*.sqlite
+
+#virtual enviroment
+env/
+.venv/
