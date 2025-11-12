@@ -2,6 +2,7 @@
 
 #python
 *.pyc
+.pytest_cache/
 
 #Logs and Data
 *.log
