@@ -317,3 +317,202 @@ class AssetCategoryTests(TestCase):
         self.assertIn('Electronics', categories)
         self.assertIn('Furniture', categories)
         self.assertIn('Software', categories)
+
+class AttributeModelTests(TestCase):
+    """
+    Tests for the Attribute model to ensure correct linking and behavior.
+    """
+
+    def setUp(self):
+        self.asset = Asset.objects.create(
+            name="Test Asset",
+            category="Electronics",
+            status="operational"
+        )
+        self.attribute = Attribute.objects.create(
+            asset=self.asset,
+            name="Serial Number",
+            value="SN9999"
+        )
+
+    def test_attribute_creation(self):
+        """Attribute should be created successfully and linked to an asset"""
+        self.assertEqual(self.attribute.name, "Serial Number")
+        self.assertEqual(self.attribute.value, "SN9999")
+        self.assertEqual(self.attribute.asset, self.asset)
+
+    def test_attribute_str_representation(self):
+        """Test __str__ returns readable format"""
+        self.assertTrue(str(self.attribute))
+
+from django.urls import resolve
+from asset_managment import views
+
+class URLResolutionTests(TestCase):
+    """
+    Test that named URLs resolve to the correct views.
+    """
+
+    def test_asset_list_resolves(self):
+        url = reverse('asset_list')
+        self.assertEqual(resolve(url).func.view_class, views.AssetListView)
+
+    def test_asset_create_resolves(self):
+        url = reverse('asset_create')
+        self.assertEqual(resolve(url).func.view_class, views.AssetCreateView)
+
+    def test_asset_detail_resolves(self):
+        asset = Asset.objects.create(name="Test")
+        url = reverse('asset_detail', kwargs={'pk': asset.pk})
+        self.assertEqual(resolve(url).func.view_class, views.AssetDetailView)
+
+    def test_asset_update_resolves(self):
+        asset = Asset.objects.create(name="Test")
+        url = reverse('asset_update', kwargs={'pk': asset.pk})
+        self.assertEqual(resolve(url).func.view_class, views.AssetUpdateView)
+
+    def test_asset_delete_resolves(self):
+        asset = Asset.objects.create(name="Test")
+        url = reverse('asset_delete', kwargs={'pk': asset.pk})
+        self.assertEqual(resolve(url).func.view_class, views.AssetDeleteView)
+
+class AssetNotFoundTests(TestCase):
+    """
+    Ensure views return 404 for missing assets.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='u', password='p')
+        self.client.login(username='u', password='p')
+
+    def test_detail_404(self):
+        response = self.client.get(reverse('asset_detail', kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_update_404(self):
+        response = self.client.get(reverse('asset_update', kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_404(self):
+        response = self.client.get(reverse('asset_delete', kwargs={'pk': 9999}))
+        self.assertEqual(response.status_code, 404)
+
+class LoginRequiredTests(TestCase):
+    """
+    Test that CRUD endpoints require authentication.
+    """
+
+    def setUp(self):
+        self.asset = Asset.objects.create(name="Chair")
+
+    def test_detail_requires_login(self):
+        response = self.client.get(reverse('asset_detail', kwargs={'pk': self.asset.pk}))
+        self.assertEqual(response.status_code, 302)
+
+    def test_create_requires_login(self):
+        response = self.client.get(reverse('asset_create'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_update_requires_login(self):
+        response = self.client.get(reverse('asset_update', kwargs={'pk': self.asset.pk}))
+        self.assertEqual(response.status_code, 302)
+
+    def test_delete_requires_login(self):
+        response = self.client.get(reverse('asset_delete', kwargs={'pk': self.asset.pk}))
+        self.assertEqual(response.status_code, 302)
+        
+class AssetUpdatePOSTTests(TestCase):
+    """
+    Verify that submitting the edit form updates the asset.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='test', password='pass')
+        self.client.login(username='test', password='pass')
+
+        self.asset = Asset.objects.create(
+            name="Old Name",
+            category="Electronics",
+            status="operational"
+        )
+
+    def test_update_asset_post(self):
+        """POSTing valid data should modify the asset"""
+        response = self.client.post(
+            reverse('asset_update', kwargs={'pk': self.asset.pk}),
+            {
+                'name': 'Updated Name',
+                'category': 'Electronics',
+                'status': 'operational'
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+
+        # Refresh from DB
+        self.asset.refresh_from_db()
+        self.assertEqual(self.asset.name, "Updated Name")
+
+class AssetDetailNoAttributeTests(TestCase):
+    """
+    Ensure detail page handles assets with no attributes.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='u', password='p')
+        self.client.login(username='u', password='p')
+        self.asset = Asset.objects.create(
+            name="NoAttr Asset",
+            category="Electronics",
+            status="operational"
+        )
+
+    def test_detail_page_shows_no_attributes_message(self):
+        response = self.client.get(reverse('asset_detail', kwargs={'pk': self.asset.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No Attributes")  # adjust based on template wording
+
+class AttributeCRUDTests(TestCase):
+    """
+    Basic tests for creating and deleting attributes from the UI.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="u", password="p")
+        self.client.login(username="u", password="p")
+        self.asset = Asset.objects.create(
+            name="Laptop",
+            category="Electronics",
+            status="operational"
+        )
+
+    def test_add_attribute(self):
+        """Test that an attribute can be added through POST."""
+        response = self.client.post(
+            reverse('attribute_create', kwargs={'pk': self.asset.pk}),
+            {
+                'name': 'Color',
+                'value': 'Black'
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Attribute.objects.filter(name='Color', asset=self.asset).exists())
+
+    def test_delete_attribute(self):
+        """Test that attribute delete removes the attribute."""
+        attribute = Attribute.objects.create(
+            asset=self.asset,
+            name='Serial',
+            value='1000'
+        )
+
+        response = self.client.post(
+            reverse('attribute_delete', kwargs={'pk': attribute.pk})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Attribute.objects.filter(pk=attribute.pk).exists())
+
+
