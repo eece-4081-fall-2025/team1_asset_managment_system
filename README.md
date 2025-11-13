@@ -16,6 +16,7 @@ python bash_spatial/manage.py migrate
 python bash_spatial/manage.py runserver
 
 ## Project Structure: 
+```
 team1_asset_management_system/
 │
 ├── bash_spatial/
@@ -37,7 +38,7 @@ team1_asset_management_system/
 ├── requirements.txt
 ├── README.md
 └── .github/workflows/         # GitHub Actions CI config
-
+```
 ## Technologies Used: 
 * Python 3.8
 * Django Framework
