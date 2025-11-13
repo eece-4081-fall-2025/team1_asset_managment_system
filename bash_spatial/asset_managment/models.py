@@ -54,6 +54,6 @@ class Asset(models.Model):
 
     @property
     def is_overdue(self):
-        if self.deprication and self.status != "out_for_repairs":
-            return self.deprication < timezone.now().date()
+        if self.depreciation and self.status != "out_for_repairs":
+            return self.depreciation < timezone.now().date()
         return False
