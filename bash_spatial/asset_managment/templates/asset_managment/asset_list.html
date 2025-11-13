@@ -1,0 +1,146 @@
+{% extends 'asset_managment/base.html' %}
+
+{% block title %}Asset List - Asset Management{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>📋 Asset Inventory</h1>
+    <a href="{% url 'asset_create' %}" class="btn btn-primary">➕ Add New Asset</a>
+</div>
+
+<!-- Search and Filter Bar (Epic 1, Story 4) -->
+<div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <form method="GET" action="{% url 'asset_list' %}">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px;">
+            <!-- Search by name or ID -->
+            <div>
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="🔍 Search assets by name or ID..." 
+                    value="{{ request.GET.search }}"
+                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px;"
+                >
+            </div>
+            
+            <!-- Category filter -->
+            <div>
+                <select 
+                    name="category" 
+                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px;"
+                >
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Status filter -->
+            <div>
+                <select 
+                    name="status" 
+                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px;"
+                >
+                    <option value="">All Status</option>
+                    <option value="operational" {% if request.GET.status == 'operational' %}selected{% endif %}>Operational</option>
+                    <option value="out_for_repairs" {% if request.GET.status == 'out_for_repairs' %}selected{% endif %}>Out for Repairs</option>
+                    <option value="checked_out" {% if request.GET.status == 'checked_out' %}selected{% endif %}>Checked Out</option>
+                    <option value="depricated" {% if request.GET.status == 'depricated' %}selected{% endif %}>Deprecated</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Asset Count -->
+<p style="color: #6b7280; margin-bottom: 20px;">
+    Showing <strong>{{ assets|length }}</strong> asset{{ assets|length|pluralize }}
+</p>
+
+<!-- Asset Table (Epic 1, Stories 2-11) -->
+{% if assets %}
+<div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                <th style="padding: 15px; text-align: left; font-weight: 600; color: #374151;">Name</th>
+                <th style="padding: 15px; text-align: left; font-weight: 600; color: #374151;">Category</th>
+                <th style="padding: 15px; text-align: left; font-weight: 600; color: #374151;">Status</th>
+                <th style="padding: 15px; text-align: left; font-weight: 600; color: #374151;">Assigned To</th>
+                <th style="padding: 15px; text-align: left; font-weight: 600; color: #374151;">Last Updated</th>
+                <th style="padding: 15px; text-align: center; font-weight: 600; color: #374151;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr style="border-bottom: 1px solid #e5e7eb; transition: background 0.2s;" 
+                onmouseover="this.style.background='#f9fafb'" 
+                onmouseout="this.style.background='white'">
+                <td style="padding: 15px;">
+                    <a href="{% url 'asset_detail' asset.pk %}" 
+                       style="color: #667eea; text-decoration: none; font-weight: 500;">
+                        {{ asset.name }}
+                    </a>
+                </td>
+                <td style="padding: 15px; color: #6b7280;">{{ asset.category }}</td>
+                <td style="padding: 15px;">
+                    {% if asset.status == 'operational' %}
+                        <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                            ✓ Operational
+                        </span>
+                    {% elif asset.status == 'out_for_repairs' %}
+                        <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                            🔧 Out for Repairs
+                        </span>
+                    {% elif asset.status == 'checked_out' %}
+                        <span style="background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                            📤 Checked Out
+                        </span>
+                    {% elif asset.status == 'depricated' %}
+                        <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                            ⚠ Deprecated
+                        </span>
+                    {% endif %}
+                </td>
+                <td style="padding: 15px; color: #6b7280;">
+                    {{ asset.assigned_to.username|default:"Unassigned" }}
+                </td>
+                <td style="padding: 15px; color: #6b7280;">
+                    {{ asset.updated_at|date:"M d, Y" }}
+                </td>
+                <td style="padding: 15px; text-align: center;">
+                    <a href="{% url 'asset_detail' asset.pk %}" 
+                       style="color: #667eea; text-decoration: none; margin-right: 10px;" 
+                       title="View Details">
+                        👁️ View
+                    </a>
+                    <a href="{% url 'asset_update' asset.pk %}" 
+                       style="color: #059669; text-decoration: none; margin-right: 10px;" 
+                       title="Edit Asset">
+                        ✏️ Edit
+                    </a>
+                    <a href="{% url 'asset_delete' asset.pk %}" 
+                       style="color: #dc2626; text-decoration: none;" 
+                       title="Delete Asset">
+                        🗑️ Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div style="text-align: center; padding: 60px 20px; color: #9ca3af;">
+    <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+    <h3 style="color: #6b7280; margin-bottom: 10px;">No Assets Found</h3>
+    <p style="margin-bottom: 20px;">Get started by adding your first asset to the inventory.</p>
+    <a href="{% url 'asset_create' %}" class="btn btn-primary">➕ Add Your First Asset</a>
+</div>
+{% endif %}
+{% endblock %}
