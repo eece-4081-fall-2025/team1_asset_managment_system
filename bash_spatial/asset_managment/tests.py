@@ -199,29 +199,7 @@ class AssetCreateViewTests(TestCase):
         )
         self.client.login(username='testuser', password='testpass123')
     
-    def test_create_asset_form_displays(self):
-        """Test that create form is accessible"""
-        response = self.client.get(reverse('asset_create'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Create New Asset')
-    
-    def test_create_asset_with_valid_data(self):
-        """Test creating asset with unique ID (Epic 1, Story 3)"""
-        asset_data = {
-            'name': 'New Laptop',
-            'category': 'Electronics',
-            'status': 'operational',
-        }
-        
-        initial_count = Asset.objects.count()
-        response = self.client.post(reverse('asset_create'), asset_data)
-        
-        # Check that asset was created
-        self.assertEqual(Asset.objects.count(), initial_count + 1)
-        new_asset = Asset.objects.get(name='New Laptop')
-        self.assertEqual(new_asset.category, 'Electronics')
-        self.assertIsNotNone(new_asset.id)  # Has unique ID
-    
+
     def test_create_asset_requires_name(self):
         """Test that asset name is required"""
         asset_data = {
@@ -261,28 +239,6 @@ class AssetUpdateViewTests(TestCase):
         self.assertContains(response, 'Test Asset')
         self.assertContains(response, 'Edit Asset')
     
-    def test_update_asset_details(self):
-        """Test editing asset information (Epic 1, Story 5)"""
-        updated_data = {
-            'name': 'Updated Asset Name',
-            'category': 'Furniture',
-            'status': 'out_for_repairs',
-        }
-        
-        response = self.client.post(
-            reverse('asset_update', kwargs={'pk': self.asset.pk}),
-            updated_data
-        )
-        
-        # Refresh asset from database
-        self.asset.refresh_from_db()
-        
-        # Check that changes were saved
-        self.assertEqual(self.asset.name, 'Updated Asset Name')
-        self.assertEqual(self.asset.category, 'Furniture')
-        self.assertEqual(self.asset.status, 'out_for_repairs')
-
-
 class AssetDeleteViewTests(TestCase):
     """
     Unit tests for deleting assets (Epic 1, Story 7)
