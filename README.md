@@ -8,13 +8,18 @@ This project was created for EECE 4081 and includes full backend logic, frontend
 
 ## Installation Steps
 ### 1. Install dependencies
+```
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+```
 ### 2. Apply database migrations
+```
 python bash_spatial/manage.py migrate
+```
 ### 3. Run the development server
+```
 python bash_spatial/manage.py runserver
-
+```
 ## Project Structure: 
 ```
 team1_asset_management_system/
