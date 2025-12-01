@@ -23,31 +23,36 @@
 <!-- Asset Status Badge -->
 <div style="margin-bottom: 30px;">
     {% if asset.status == 'operational' %}
-        <span style="background: #d1fae5; color: #065f46; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
-            ✓ Operational
-        </span>
+    <span
+        style="background: #d1fae5; color: #065f46; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
+        ✓ Operational
+    </span>
     {% elif asset.status == 'out_for_repairs' %}
-        <span style="background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
-            🔧 Out for Repairs
-        </span>
+    <span
+        style="background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
+        🔧 Out for Repairs
+    </span>
     {% elif asset.status == 'checked_out' %}
-        <span style="background: #dbeafe; color: #1e40af; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
-            📤 Checked Out
-        </span>
+    <span
+        style="background: #dbeafe; color: #1e40af; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
+        📤 Checked Out
+    </span>
     {% elif asset.status == 'depricated' %}
-        <span style="background: #fee2e2; color: #991b1b; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
-            ⚠ Deprecated
-        </span>
+    <span
+        style="background: #fee2e2; color: #991b1b; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;">
+        ⚠ Deprecated
+    </span>
     {% endif %}
 </div>
 
 <!-- Basic Information (Epic 1, Stories 8, 9) -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
     <div>
-        <h3 style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+        <h3
+            style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
             Basic Information
         </h3>
-        
+
         <div style="display: grid; gap: 15px;">
             <div>
                 <label style="display: block; color: #6b7280; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
@@ -55,7 +60,7 @@
                 </label>
                 <p style="color: #1f2937; font-size: 16px;">{{ asset.category }}</p>
             </div>
-            
+
             <div>
                 <label style="display: block; color: #6b7280; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
                     Assigned To
@@ -64,30 +69,31 @@
                     {{ asset.assigned_to.username|default:"Unassigned" }}
                 </p>
             </div>
-            
+
             <div>
                 <label style="display: block; color: #6b7280; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
                     Depreciation Date
                 </label>
                 <p style="color: #1f2937; font-size: 16px;">
                     {% if asset.depreciation %}
-                        {{ asset.depreciation|date:"F d, Y" }}
-                        {% if asset.is_overdue %}
-                            <span style="color: #dc2626; font-weight: 500;">⚠️ Overdue</span>
-                        {% endif %}
+                    {{ asset.depreciation|date:"F d, Y" }}
+                    {% if asset.is_overdue %}
+                    <span style="color: #dc2626; font-weight: 500;">⚠️ Overdue</span>
+                    {% endif %}
                     {% else %}
-                        Not specified
+                    Not specified
                     {% endif %}
                 </p>
             </div>
         </div>
     </div>
-    
+
     <div>
-        <h3 style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+        <h3
+            style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
             Timestamps
         </h3>
-        
+
         <div style="display: grid; gap: 15px;">
             <div>
                 <label style="display: block; color: #6b7280; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
@@ -95,7 +101,7 @@
                 </label>
                 <p style="color: #1f2937; font-size: 16px;">{{ asset.created_at|date:"F d, Y g:i A" }}</p>
             </div>
-            
+
             <div>
                 <label style="display: block; color: #6b7280; font-size: 14px; margin-bottom: 5px; font-weight: 500;">
                     Last Updated
@@ -108,10 +114,11 @@
 
 <!-- Custom Attributes (Epic 1, Stories 9, 10, 11) -->
 <div style="margin-bottom: 30px;">
-    <h3 style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+    <h3
+        style="color: #374151; font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
         Custom Attributes
     </h3>
-    
+
     {% if asset.attributes_set.all %}
     <div style="background: #f9fafb; padding: 20px; border-radius: 8px;">
         <table style="width: 100%; border-collapse: collapse;">
@@ -143,19 +150,11 @@
     <div style="text-align: center; padding: 40px; background: #f9fafb; border-radius: 8px; color: #9ca3af;">
         <p>No custom attributes added yet.</p>
         <p style="font-size: 14px; margin-top: 10px;">
-            <a href="{% url 'asset_update' asset.pk %}" style="color: #667eea;">Edit this asset</a> to add attributes like serial number, purchase date, warranty info, etc.
+            <a href="{% url 'asset_update' asset.pk %}" style="color: #667eea;">Edit this asset</a> to add attributes
+            like serial number, purchase date, warranty info, etc.
         </p>
     </div>
     {% endif %}
 </div>
 
-<!-- Action Buttons -->
-<div style="display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-    <a href="{% url 'asset_update' asset.pk %}" class="btn btn-primary">
-        ✏️ Edit Asset Information
-    </a>
-    <a href="{% url 'asset_list' %}" class="btn btn-secondary">
-        ← Back to List
-    </a>
-</div>
 {% endblock %}

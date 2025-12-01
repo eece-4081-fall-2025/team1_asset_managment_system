@@ -1,9 +1,5 @@
 {% extends 'asset_managment/base.html' %}
 
-{% block title %}
-    {% if form.instance.pk %}Edit Asset{% else %}Create New Asset{% endif %} - Asset Management
-{% endblock %}
-
 {% block content %}
 <div style="margin-bottom: 20px;">
     <a href="{% url 'asset_list' %}" style="color: #667eea; text-decoration: none;">
@@ -12,49 +8,51 @@
 </div>
 
 <h1 style="margin-bottom: 30px;">
-    {% if form.instance.pk %}
-        ✏️ Edit Asset: {{ form.instance.name }}
+    {% if form.instance.name != '' %}
+    ✏️ Edit Asset: {{ form.instance.name }}
     {% else %}
-        ➕ Create New Asset
+    ➕ Create New Asset
     {% endif %}
 </h1>
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    
+
     <!-- Display form errors -->
     {% if form.errors %}
     <div class="alert alert-error" style="margin-bottom: 20px;">
         <strong>Please correct the following errors:</strong>
         <ul style="margin-top: 10px; margin-left: 20px;">
             {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <li>{{ field }}: {{ error }}</li>
-                {% endfor %}
+            {% for error in errors %}
+            <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
             {% endfor %}
         </ul>
     </div>
     {% endif %}
-    
+
     <!-- Basic Asset Information (Epic 1, Stories 3, 5) -->
     <div style="background: #f9fafb; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
         <h3 style="color: #374151; margin-bottom: 20px;">Basic Information</h3>
-        
+
         <div style="display: grid; gap: 20px;">
             <!-- Name Field -->
             <div>
-                <label for="{{ form.name.id_for_label }}" style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
+                <label for="{{ form.name.id_for_label }}"
+                    style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
                     Asset Name <span style="color: #dc2626;">*</span>
                 </label>
                 {{ form.name }}
                 {% if form.name.errors %}
-                    <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.name.errors.0 }}</p>
+                <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.name.errors.0 }}</p>
                 {% endif %}
             </div>
-            
+
             <!-- Category Field (Epic 1, Story 4) -->
             <div>
-                <label for="{{ form.category.id_for_label }}" style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
+                <label for="{{ form.category.id_for_label }}"
+                    style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
                     Category <span style="color: #dc2626;">*</span>
                 </label>
                 {{ form.category }}
@@ -62,24 +60,26 @@
                     e.g., Electronics, Furniture, Software, Vehicles
                 </p>
                 {% if form.category.errors %}
-                    <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.category.errors.0 }}</p>
+                <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.category.errors.0 }}</p>
                 {% endif %}
             </div>
-            
+
             <!-- Status Field -->
             <div>
-                <label for="{{ form.status.id_for_label }}" style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
+                <label for="{{ form.status.id_for_label }}"
+                    style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
                     Status <span style="color: #dc2626;">*</span>
                 </label>
                 {{ form.status }}
                 {% if form.status.errors %}
-                    <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.status.errors.0 }}</p>
+                <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.status.errors.0 }}</p>
                 {% endif %}
             </div>
-            
+
             <!-- Assigned To Field (Epic 4, Story 22) -->
             <div>
-                <label for="{{ form.assigned_to.id_for_label }}" style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
+                <label for="{{ form.assigned_to.id_for_label }}"
+                    style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
                     Assigned To
                 </label>
                 {{ form.assigned_to }}
@@ -87,13 +87,14 @@
                     Leave empty if not assigned to anyone
                 </p>
                 {% if form.assigned_to.errors %}
-                    <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.assigned_to.errors.0 }}</p>
+                <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.assigned_to.errors.0 }}</p>
                 {% endif %}
             </div>
-            
+
             <!-- Depreciation Field -->
             <div>
-                <label for="{{ form.depreciation.id_for_label }}" style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
+                <label for="{{ form.depreciation.id_for_label }}"
+                    style="display: block; color: #374151; font-weight: 500; margin-bottom: 8px;">
                     Depreciation Date
                 </label>
                 {{ form.depreciation }}
@@ -101,45 +102,49 @@
                     Expected retirement or replacement date (YYYY-MM-DD)
                 </p>
                 {% if form.depreciation.errors %}
-                    <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.depreciation.errors.0 }}</p>
+                <p style="color: #dc2626; font-size: 14px; margin-top: 5px;">{{ form.depreciation.errors.0 }}</p>
                 {% endif %}
             </div>
         </div>
     </div>
-    
+
     <!-- Custom Attributes Section (Epic 1, Stories 9, 10, 24) -->
     <div style="background: #f9fafb; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
         <h3 style="color: #374151; margin-bottom: 10px;">Custom Attributes</h3>
         <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">
             Add specific details like Serial Number, Purchase Date, Warranty Info, etc.
         </p>
-        
+
         <div id="attribute-formset">
             {{ formset.management_form }}
-            
+
             {% for form in formset %}
-            <div class="attribute-form" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #e5e7eb;">
+            <div class="attribute-form"
+                style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #e5e7eb;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: start;">
                     <div>
-                        <label style="display: block; color: #374151; font-weight: 500; margin-bottom: 5px; font-size: 14px;">
+                        <label
+                            style="display: block; color: #374151; font-weight: 500; margin-bottom: 5px; font-size: 14px;">
                             Attribute Name
                         </label>
                         {{ form.name }}
                     </div>
-                    
+
                     <div>
-                        <label style="display: block; color: #374151; font-weight: 500; margin-bottom: 5px; font-size: 14px;">
+                        <label
+                            style="display: block; color: #374151; font-weight: 500; margin-bottom: 5px; font-size: 14px;">
                             Value
                         </label>
                         {{ form.value }}
                     </div>
-                    
+
                     <div style="padding-top: 28px;">
                         {% if form.instance.pk %}
-                            {{ form.DELETE }}
-                            <label for="{{ form.DELETE.id_for_label }}" style="color: #dc2626; font-size: 13px; cursor: pointer;">
-                                🗑️ Delete
-                            </label>
+                        {{ form.DELETE }}
+                        <label for="{{ form.DELETE.id_for_label }}"
+                            style="color: #dc2626; font-size: 13px; cursor: pointer;">
+                            🗑️ Delete
+                        </label>
                         {% endif %}
                     </div>
                 </div>
@@ -147,20 +152,20 @@
             </div>
             {% endfor %}
         </div>
-        
+
         <p style="color: #6b7280; font-size: 13px; font-style: italic; margin-top: 10px;">
             💡 Tip: Leave the last row empty if you don't need more attributes
         </p>
     </div>
-    
+
     <!-- Submit Buttons -->
     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
-        <a href="{% url 'asset_list' %}" 
-           style="padding: 10px 20px; background: #e5e7eb; color: #374151; text-decoration: none; border-radius: 6px;">
-           Cancel
+        <a href="{% url 'asset_list' %}"
+            style="padding: 10px 20px; background: #e5e7eb; color: #374151; text-decoration: none; border-radius: 6px;">
+            Cancel
         </a>
-        <button type="submit" 
-                style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+        <button type="submit"
+            style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
             {% if form.instance.pk %}Update Asset{% else %}Create Asset{% endif %}
         </button>
     </div>
