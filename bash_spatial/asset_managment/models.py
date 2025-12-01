@@ -2,6 +2,7 @@ import uuid
 from time import timezone
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import Group
 
 
 class Attribute(models.Model):
@@ -56,4 +57,20 @@ class Asset(models.Model):
     def is_overdue(self):
         if self.depreciation and self.status != "out_for_repairs":
             return self.depreciation < timezone.now().date()
+        return False
+    
+    def has_access(self, user):
+        if user.is_superuser:
+            return True
+        
+        if self.assigned_to == user:
+            return True
+        
+        try:
+            manager_group = Group.objects.get(name='manager')
+            if manager_group in user.groups.all():
+                return True
+        except Group.DoesNotExist:
+            pass 
+
         return False

@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from .models import Asset, Attribute
 from .forms import AssetForm, AssetAttributeFormSet
-
+from django.contrib.auth.models import Group
 
 class CustomLoginView(LoginView):
     """
@@ -25,7 +25,6 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('asset_list')
 
-
 class AssetListView(LoginRequiredMixin, ListView):
     """
     Epic 1, Stories 2-4: Asset list with search and filtering
@@ -35,7 +34,10 @@ class AssetListView(LoginRequiredMixin, ListView):
     context_object_name = "assets"
     
     def get_queryset(self):
+        user = self.request.user
         queryset = Asset.objects.all().order_by('-created_at')
+        if not user.is_superuser and not user.is_staff:
+            queryset.filter(assigned_to=user)
         
         # Search functionality (Epic 1, Story 4)
         search_query = self.request.GET.get('search', '')
@@ -60,21 +62,39 @@ class AssetListView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         # Get unique categories for filter dropdown
         context['categories'] = Asset.objects.values_list('category', flat=True).distinct()
+        
+        # Get the queryset (already filtered by security in get_queryset if you did that)
+        assets_temp = context['assets']
+        assets = []
+        for a in assets_temp:
+            if a.has_access(user):
+                assets.append(a)
+
+
+         
+        context['assets'] = assets
         return context
 
-
-class AssetDetailView(LoginRequiredMixin, DetailView):
+class AssetDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     """
     Epic 1, Stories 5, 8, 9: View asset details with attributes
     """
     model = Asset
     template_name = "asset_managment/asset_detail.html"
     context_object_name = "asset"
+    def test_func(self):
+        asset = self.get_object() 
+        return asset.has_access(self.request.user)
+    
+    def test_func(self):
+        asset = self.get_object() 
+        return asset.has_access(self.request.user)
+    
 
-
-class AssetCreateView(LoginRequiredMixin, CreateView):
+class AssetCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     Epic 1, Story 3: Add new asset with unique ID
     Epic 1, Story 10: Add attributes to assets
@@ -103,9 +123,22 @@ class AssetCreateView(LoginRequiredMixin, CreateView):
             return redirect(self.success_url)
         else:
             return self.form_invalid(form)
+    
+    def test_func(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return True
+        try:
+            manager_group = Group.objects.get(name='manager')
+            if manager_group in user.groups.all():
+                return True
+        except Group.DoesNotExist:
+            pass 
+        return False
 
 
-class AssetUpdateView(LoginRequiredMixin, UpdateView):
+class AssetUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Epic 1, Story 5: Edit asset details
     Epic 1, Story 6: Duplicate functionality through editing
@@ -139,15 +172,23 @@ class AssetUpdateView(LoginRequiredMixin, UpdateView):
             return redirect(self.get_success_url())
         else:
             return self.form_invalid(form)
+    
+    def test_func(self):
+        asset = self.get_object() 
+        return asset.has_access(self.request.user)
 
 
-class AssetDeleteView(LoginRequiredMixin, DeleteView):
+class AssetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     Epic 1, Story 7: Delete outdated or retired assets
     """
     model = Asset
     template_name = "asset_managment/asset_confirm_delete.html"
     success_url = reverse_lazy("asset_list")
+
+    def test_func(self):
+        asset = self.get_object() 
+        return asset.has_access(self.request.user)
 
 
 @login_required
