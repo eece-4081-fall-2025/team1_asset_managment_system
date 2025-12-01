@@ -3,27 +3,23 @@
 {% block title %}Delete Asset - {{ asset.name }}{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 20px;">
-    <a href="{% url 'asset_detail' asset.pk %}" style="color: #667eea; text-decoration: none;">
-        ← Back to Asset Details
-    </a>
-</div>
 
 <div style="max-width: 600px; margin: 0 auto; text-align: center;">
     <!-- Warning Icon -->
     <div style="font-size: 64px; margin-bottom: 20px;">
         ⚠️
     </div>
-    
+
     <h1 style="color: #dc2626; margin-bottom: 20px;">
         Delete Asset?
     </h1>
-    
-    <div style="background: #fee2e2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left;">
+
+    <div
+        style="background: #fee2e2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: left;">
         <p style="color: #991b1b; margin-bottom: 15px; font-weight: 500;">
             You are about to permanently delete the following asset:
         </p>
-        
+
         <div style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
             <p style="color: #1f2937; font-size: 18px; font-weight: 600; margin-bottom: 5px;">
                 {{ asset.name }}
@@ -37,12 +33,13 @@
             </p>
             {% endif %}
         </div>
-        
+
         <p style="color: #991b1b; font-size: 14px;">
-            <strong>⚠️ Warning:</strong> This action cannot be undone. All associated data including custom attributes will be permanently deleted.
+            <strong>⚠️ Warning:</strong> This action cannot be undone. All associated data including custom attributes
+            will be permanently deleted.
         </p>
     </div>
-    
+
     <!-- Confirmation Form -->
     <form method="POST" style="display: inline-block;">
         {% csrf_token %}
@@ -55,9 +52,6 @@
             </a>
         </div>
     </form>
-    
-    <p style="color: #6b7280; font-size: 13px; margin-top: 20px;">
-        Or go back to <a href="{% url 'asset_list' %}" style="color: #667eea;">asset list</a>
-    </p>
+
 </div>
 {% endblock %}
