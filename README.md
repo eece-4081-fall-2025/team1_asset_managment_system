@@ -16,6 +16,12 @@ python -m pip install -r requirements.txt
 ```
 python bash_spatial/manage.py migrate
 ```
+### 3. Create admin user
+Run
+```
+python bash_spatial/manage.py createsuperuser
+```
+and follow on-screen instructions
 ### 3. Run the development server
 ```
 python bash_spatial/manage.py runserver
