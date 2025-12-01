@@ -38,7 +38,7 @@ team1_asset_management_system/
 │   │   ├── urls.py
 │   │   ├── templates/
 │   │   ├── static/
-│   │   ├── forms.py          # if present
+│   │   ├── forms.py
 │   │   └── tests.py
 │   │
 │   ├── project_settings/
@@ -48,7 +48,7 @@ team1_asset_management_system/
 │
 ├── requirements.txt
 ├── README.md
-└── .github/workflows/         # GitHub Actions CI config
+└── .github/workflows/
 ```
 ## Technologies Used: 
 * Python 3.8
