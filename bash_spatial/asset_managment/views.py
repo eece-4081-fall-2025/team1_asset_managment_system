@@ -209,3 +209,62 @@ def assign_asset_view(request, pk):
             return redirect("asset_detail", pk=pk)
 
     return render(request, "asset_managment/assign_asset_form.html", {"asset": asset})
+
+@login_required
+def asset_duplicate_view(request, pk):
+    """
+    Epic 1, Story 6: Duplicate asset to simplify creating similar assets
+    """
+    # Get the original asset
+    original_asset = get_object_or_404(Asset, pk=pk)
+    
+    if request.method == 'GET':
+        # Create a form pre-filled with the original asset's data
+        form = AssetForm(initial={
+            'name': f"{original_asset.name} (Copy)",
+            'category': original_asset.category,
+            'status': original_asset.status,
+            'depreciation': original_asset.depreciation,
+            # Don't copy assigned_to - new asset should be unassigned
+        })
+        
+        # Create empty formset for attributes
+        formset = AssetAttributeFormSet()
+        
+        context = {
+            'form': form,
+            'formset': formset,
+            'is_duplicate': True,
+            'original_asset': original_asset,
+        }
+        return render(request, 'asset_managment/asset_form.html', context)
+    
+    elif request.method == 'POST':
+        form = AssetForm(request.POST)
+        formset = AssetAttributeFormSet(request.POST)
+        
+        if form.is_valid() and formset.is_valid():
+            # Create the new asset
+            new_asset = form.save()
+            
+            # Copy attributes from original asset
+            for attr in original_asset.attributes_set.all():
+                Attribute.objects.create(
+                    asset=new_asset,
+                    name=attr.name,
+                    value=attr.value
+                )
+            
+            # Also save any new attributes from formset
+            formset.instance = new_asset
+            formset.save()
+            
+            return redirect('asset_detail', pk=new_asset.pk)
+        else:
+            context = {
+                'form': form,
+                'formset': formset,
+                'is_duplicate': True,
+                'original_asset': original_asset,
+            }
+            return render(request, 'asset_managment/asset_form.html', context)

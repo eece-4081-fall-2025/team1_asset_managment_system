@@ -8,12 +8,22 @@
 </div>
 
 <h1 style="margin-bottom: 30px;">
-    {% if form.instance.name != '' %}
-    ✏️ Edit Asset: {{ form.instance.name }}
+    {% if is_duplicate %}
+        📋 Duplicate Asset: {{ original_asset.name }}
+    {% elif form.instance.name != '' %}
+        ✏️ Edit Asset: {{ form.instance.name }}
     {% else %}
-    ➕ Create New Asset
+        ➕ Create New Asset
     {% endif %}
 </h1>
+
+{% if is_duplicate %}
+<div class="alert alert-info" style="margin-bottom: 20px;">
+    📋 Creating a copy of <strong>{{ original_asset.name }}</strong>. 
+    The form has been pre-filled with the original asset's information. 
+    Make any changes you need and click Create Asset.
+</div>
+{% endif %}
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
@@ -166,7 +176,7 @@
         </a>
         <button type="submit"
             style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-            {% if form.instance.pk %}Update Asset{% else %}Create Asset{% endif %}
+            {% if form.instance.name != '' %}Update Asset{% else %}Create Asset{% endif %}
         </button>
     </div>
 </form>

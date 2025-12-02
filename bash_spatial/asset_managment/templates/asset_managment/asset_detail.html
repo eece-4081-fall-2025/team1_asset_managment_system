@@ -16,6 +16,7 @@
     </div>
     <div style="display: flex; gap: 10px;">
         <a href="{% url 'asset_update' asset.pk %}" class="btn btn-primary">✏️ Edit Asset</a>
+        <a href="{% url 'asset_duplicate' asset.pk %}" class="btn btn-secondary">📋 Duplicate</a>
         <a href="{% url 'asset_delete' asset.pk %}" class="btn btn-danger">🗑️ Delete</a>
     </div>
 </div>
