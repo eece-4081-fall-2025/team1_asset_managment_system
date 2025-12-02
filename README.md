@@ -54,9 +54,7 @@ team1_asset_management_system/
 * Python 3.8
 * Django Framework
 * SQLite (default database)
-* Optional support for PostgreSQL
 * HTML, CSS, JavaScript
-* Bootstrap (if used)
 * GitHub Actions for automated test running
 
 ## Running Tests: 
