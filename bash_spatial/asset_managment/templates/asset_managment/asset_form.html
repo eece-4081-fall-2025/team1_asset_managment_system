@@ -10,7 +10,7 @@
 <h1 style="margin-bottom: 30px;">
     {% if is_duplicate %}
         📋 Duplicate Asset: {{ original_asset.name }}
-    {% elif form.instance.pk %}
+    {% elif form.instance.name != '' %}
         ✏️ Edit Asset: {{ form.instance.name }}
     {% else %}
         ➕ Create New Asset
@@ -176,7 +176,7 @@
         </a>
         <button type="submit"
             style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-            {% if form.instance.pk %}Update Asset{% else %}Create Asset{% endif %}
+            {% if form.instance.name != '' %}Update Asset{% else %}Create Asset{% endif %}
         </button>
     </div>
 </form>
